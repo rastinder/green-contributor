@@ -1,0 +1,15 @@
+{
+  "name": "green-contributor",
+  "version": "1.0.0",
+  "description": "GitHub contribution automation",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "simple-git": "^3.22.0",
+    "node-schedule": "^2.1.1",
+    "dotenv": "^16.4.1"
+  }
+}
