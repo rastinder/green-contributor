@@ -1,0 +1,39 @@
+GitHub Green Contributor - Setup Instructions
+
+AUTOMATIC SETUP (Recommended):
+1. Double-click "start_contributor.bat" to start the automation
+2. Run "create_shortcut.ps1" by right-clicking and selecting "Run with PowerShell"
+   - This automatically creates the startup shortcut
+   - You'll see a confirmation message when it's done
+
+MANUAL SETUP (Alternative):
+If you prefer to set it up manually:
+1. Press Windows + R
+2. Type "shell:startup" and press Enter
+3. Copy "start_hidden.vbs"
+4. Paste it in the Startup folder
+
+VERIFY IT'S WORKING:
+1. Check Current Status:
+   - Open PowerShell and run: pm2 status
+   - Should see "green-contributor" process running
+
+2. View Commit Logs:
+   - Run: pm2 logs green-contributor
+   - You'll see scheduled commit times
+
+3. Check Task Manager:
+   - Look for "node.exe" processes
+   - The automation is running if you see them
+
+4. Monitor GitHub:
+   - Check your GitHub profile
+   - You should see new contributions appearing
+
+TROUBLESHOOTING:
+If the automation stops:
+1. Double-click start_contributor.bat
+2. Wait for "Process started!" message
+3. Close the window
+
+Note: Keep all files in D:\projects\all_green directory. Don't move or delete them.
