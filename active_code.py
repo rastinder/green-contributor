@@ -11,3 +11,6 @@ def binary_search(arr, target):
         else:
             right = mid - 1
     return -1
+
+def calculate_sum(numbers):
+    return sum(numbers)
