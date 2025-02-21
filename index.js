@@ -61,7 +61,7 @@ print(${scriptPath.replace('.py', '')}.${functionName}())
 }
 
 // Function to make random changes to code file
-async function makeRandomChange() {
+async function makeRandomChange(useLargeSnippet = false) {
     const timestamp = new Date().toISOString();
     
     try {
@@ -69,16 +69,20 @@ async function makeRandomChange() {
         const currentContent = await readFile(PYTHON_FILE, 'utf8');
         
         // Randomly decide to either add or remove code
-        const shouldAdd = Math.random() > 0.5;
+        const shouldAdd = Math.random() > 0.5 || useLargeSnippet;
         
         let newContent;
         let commitMessage;
         
         if (shouldAdd) {
-            // Get a random code snippet
-            const snippet = await getPythonOutput('code_snippets', 'get_random_snippet');
+            // Get appropriate snippet
+            const snippet = useLargeSnippet
+                ? await getPythonOutput('code_snippets', 'get_large_snippet')
+                : await getPythonOutput('code_snippets', 'get_random_snippet');
             newContent = currentContent + '\n\n' + snippet;
-            commitMessage = `feat: Add new function at ${timestamp}`;
+            commitMessage = useLargeSnippet
+                ? `feat: Add comprehensive data structures implementation at ${timestamp}`
+                : `feat: Add new function at ${timestamp}`;
         } else if (currentContent.trim() !== '') {
             // Remove a random existing function if file is not empty
             const lines = currentContent.split('\n');
@@ -135,15 +139,22 @@ async function makeRandomChange() {
 
 // Schedule random commits throughout the day
 function scheduleCommits() {
-    // Make between 1-10 commits per day at random times
-    const commitsToday = Math.floor(Math.random() * 10) + 1;
+    // Make between 5-15 commits per day at random times
+    const commitsToday = Math.floor(Math.random() * 11) + 5;
     
-    for (let i = 0; i < commitsToday; i++) {
+    // Schedule one large commit
+    const largeCommitHour = Math.floor(Math.random() * 24);
+    const largeCommitMinute = Math.floor(Math.random() * 60);
+    schedule.scheduleJob(`${largeCommitMinute} ${largeCommitHour} * * *`, () => makeRandomChange(true));
+    console.log(`Scheduled large commit for ${largeCommitHour}:${largeCommitMinute}`);
+    
+    // Schedule regular commits
+    for (let i = 0; i < commitsToday - 1; i++) {
         const hour = Math.floor(Math.random() * 24);
         const minute = Math.floor(Math.random() * 60);
         
-        schedule.scheduleJob(`${minute} ${hour} * * *`, makeRandomChange);
-        console.log(`Scheduled commit for ${hour}:${minute}`);
+        schedule.scheduleJob(`${minute} ${hour} * * *`, () => makeRandomChange(false));
+        console.log(`Scheduled regular commit for ${hour}:${minute}`);
     }
 }
 
