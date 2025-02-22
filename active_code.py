@@ -7,6 +7,7 @@ def bubble_sort(arr):
     return arr
 
 
+
 def bubble_sort(arr):
     n = len(arr)
     for i in range(n):
@@ -14,6 +15,7 @@ def bubble_sort(arr):
             if arr[j] > arr[j+1]:
                 arr[j], arr[j+1] = arr[j+1], arr[j]
     return arr
+
 
 
 def data_structures_and_algorithms():
@@ -167,8 +169,6 @@ def data_structures_and_algorithms():
     
     return example_usage
 
-def is_palindrome(text):
-    return text == text[::-1]
 
 def data_structures_and_algorithms():
     class Node:
