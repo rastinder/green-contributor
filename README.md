@@ -1,3 +1,53 @@
+# File Operations Plan
+
+## Objective
+Create and delete random files programmatically through a Python script.
+
+## Implementation Steps
+
+1. Create `file_operations.py` with:
+```python
+import os
+import random
+import string
+
+EXCLUDE_FILES = ['README.md', '.gitignore', 'package.json', 'active_code.py', 'data.txt']
+
+def generate_random_filename():
+    chars = string.ascii_lowercase + string.digits
+    return f"file_{''.join(random.choices(chars, k=6))}.txt"
+
+def create_random_files(num_files=8):
+    for _ in range(num_files):
+        filename = generate_random_filename()
+        with open(filename, 'w') as f:
+            f.write(f"Random content: {random.randint(1000,9999)}")
+
+def delete_random_files(num_files=8):
+    all_files = [f for f in os.listdir()
+                if os.path.isfile(f) and f not in EXCLUDE_FILES]
+    
+    if not all_files:
+        print("No files available to delete")
+        return
+    
+    to_delete = random.sample(all_files, min(num_files, len(all_files)))
+    for file in to_delete:
+        try:
+            os.remove(file)
+            print(f"Deleted: {file}")
+        except Exception as e:
+            print(f"Error deleting {file}: {str(e)}")
+
+if __name__ == "__main__":
+    create_random_files(random.randint(5, 10))
+    delete_random_files(random.randint(5, 10))
+    print("File operations completed")
+```
+2. Execute with: `python file_operations.py`
+
+## Required Mode Switch
+Switch to Code mode to implement and execute this solution
 # Green Contributor
 
 This tool automates GitHub contributions by making random commits throughout the day.
