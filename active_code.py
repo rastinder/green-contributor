@@ -1,12 +1,8 @@
-# Active Python Code
-
 def fibonacci(n):
     if n <= 1:
         return n
     return fibonacci(n-1) + fibonacci(n-2)
 
-def calculate_sum(numbers):
-    return sum(numbers)
 
 def binary_search(arr, target):
     left, right = 0, len(arr) - 1
@@ -20,8 +16,10 @@ def binary_search(arr, target):
             right = mid - 1
     return -1
 
+
 def is_palindrome(text):
     return text == text[::-1]
+
 
 def fibonacci(n):
     if n <= 1:
