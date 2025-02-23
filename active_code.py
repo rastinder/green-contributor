@@ -1,9 +1,3 @@
-def is_palindrome(text):
-    return text == text[::-1]
-
-
-
-
 def data_structures_and_algorithms():
     class Node:
         def __init__(self, data):
@@ -154,6 +148,7 @@ def data_structures_and_algorithms():
         print("Right subtree height:", avl_tree.get_height(root.right))
     
     return example_usage
+
 
 
 def bubble_sort(arr):
