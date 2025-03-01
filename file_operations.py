@@ -167,89 +167,34 @@ def create_random_files(num_files: int = 8) -> List[str]:
             imports = """from typing import Dict, List, Any, Union
 import json
 from datetime import datetime
-from inspect import getmembers, isfunction
+from inspect import getmembers, isfunction, currentframe
 import csv
 import os
+import pandas as pd
 
 """
-            
-            content = f'''"""
-Auto-generated Python file for GitHub contributions.
-Generated at: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-
-This file contains Python code for data processing with error handling.
-"""
-
-{imports}
-
-{generated_code}
-
-def run_tests():
-    """Execute tests based on the function type"""
-    funcs = dict(getmembers(globals(), isfunction))
-    test_data = None
-    func = None
-
-    # Create a temporary test file for CSV functions if needed
-    test_csv = None
-    if any(name for name in funcs if 'csv' in name.lower()):
-        test_csv = 'test_data.csv'
-        with open(test_csv, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['name', 'age', 'salary'])
-            writer.writerow(['John', '30', '50000'])
-            writer.writerow(['Alice', '25', '45000'])
-    
-    try:
-        if 'process_data' in funcs:
-            test_data = [
-                {{"name": "Test User", "age": 25, "status": "ACTIVE"}},
-                {{"input": "Hello", "value": 123, "type": "test"}}
-            ]
-            func = process_data
-        elif 'analyze_text' in funcs:
-            test_data = [
-                "Hello World! This is a Test String.",
-                "UPPER lower 12345 !@#$%"
-            ]
-            func = analyze_text
-        elif 'transform_list' in funcs:
-            test_data = [
-                ["item1", "ITEM2", "Item3"],
-                ["Python", "JAVA", "TypeScript"]
-            ]
-            func = transform_list
-        elif 'process_csv' in funcs:
-            test_data = [
-                ('test_data.csv', 'age'),
-                ('test_data.csv', 'salary')
-            ]
-            func = process_csv
-        elif 'calculate_average_from_csv' in funcs:
-            test_data = [
-                ('test_data.csv', 'age'),
-                ('test_data.csv', 'salary')
-            ]
-            func = calculate_average_from_csv
-        elif 'process_and_analyze_data' in funcs:
-            test_data = [
-                ('test_data.csv', 'age'),
-                ('test_data.csv', 'salary')
-            ]
-            func = process_and_analyze_data
-        
-        if func and test_data:
+            content = f'''"""\nAuto-generated Python file for GitHub contributions.\nGenerated at: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\nThis file contains Python code for data processing with error handling.\n"""\n\n{imports}\n\n{generated_code}\n\ndef run_tests():\n    """Execute tests based on the function type"""\n    funcs = dict(getmembers(globals(), isfunction))\n    test_data = None\n    func = None\n\n    # Create a temporary test file for CSV functions if needed\n    test_csv = None\n    if any(name for name in funcs if 'csv' in name.lower()):\n        test_csv = 'test_data.csv'\n        with open(test_csv, 'w', newline='') as f:\n            writer = csv.writer(f)\n            writer.writerow(['name', 'age', 'salary'])\n            writer.writerow(['John', '30', '50000'])\n            writer.writerow(['Alice', '25', '45000'])\n    \n    try:\n        if 'process_data' in funcs:\n            test_data = [\n                {{"name": "Test User", "age": 25, "status": "ACTIVE"}},\n                {{"input": "Hello", "value": 123, "type": "test"}}\n            ]\n            func = process_data\n        elif 'analyze_text' in funcs:\n            test_data = [\n                "Hello World! This is a Test String.",\n                "UPPER lower 12345 !@#$%"\n            ]\n            func = analyze_text\n        elif 'transform_list' in funcs:\n            test_data = [\n                ["item1", "ITEM2", "Item3"],\n                ["Python", "JAVA", "TypeScript"]\n            ]\n            func = transform_list\n        elif 'process_csv' in funcs:\n            test_data = [\n                ('test_data.csv', 'age'),\n                ('test_data.csv', 'salary')\n            ]\n            func = process_csv\n        elif 'calculate_average_from_csv' in funcs:\n            test_data = [\n                ('test_data.csv', 'age'),\n                ('test_data.csv', 'salary')\n            ]\n            func = calculate_average_from_csv\n        elif 'process_and_analyze_data' in funcs:\n            test_data = [\n                ('test_data.csv', 'age'),\n                ('test_data.csv', 'salary')\n            ]\n            func = process_and_analyze_data\n        \n        if func and test_data:
             print("\\nRunning tests...")
-            for i, data in enumerate(test_data, 1):
+            for test_index, data in enumerate(test_data, 1):
                 try:
-                    print(f"\\nTest #{i}")
+                    print(f"\\nTest #{{test_index}}")
                     if isinstance(data, tuple):
                         print(f"Input: {{data}}")
                         result = func(*data)
                     else:
                         print(f"Input: {{json.dumps(data, indent=2)}}")
                         result = func(data)
-                    print(f"Result: {{json.dumps(result, default=str, indent=2)}}")
+                    # Improved JSON serialization with better handling of various data types
+                    def json_serializer(obj):
+                        if isinstance(obj, (datetime, pd.Timestamp)):
+                            return obj.isoformat()
+                        elif isinstance(obj, (tuple, set)):
+                            return list(obj)
+                        elif hasattr(obj, '__dict__'):
+                            return obj.__dict__
+                        return str(obj)
+                    
+                    print(f"Result: {{json.dumps(result, default=json_serializer, indent=2)}}")
                 except Exception as e:
                     print(f"Error: {{str(e)}}")
         else:
@@ -264,9 +209,14 @@ if __name__ == "__main__":
     # Get all functions in the current module
     all_functions = dict(getmembers(globals(), isfunction))
     # Remove utility functions to avoid confusion
-    for util_func in ['run_tests', 'getmembers', 'isfunction']:
+    for util_func in ['run_tests', 'getmembers', 'isfunction', 'currentframe']:
         all_functions.pop(util_func, None)
     
+    # Define generated_code variable to avoid reference errors
+    generated_code = ''
+    for func_name in all_functions:
+        generated_code += func_name + ' '
+        
     # Now run the tests with the available functions
     run_tests()
 '''
