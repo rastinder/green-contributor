@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-02 00:42:08
+Generated at: 2025-03-02 01:14:55
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,50 +15,63 @@ import pandas as pd
 
 
 
-from typing import List, Tuple, Union
-import statistics
+import pandas as pd
+from typing import Tuple, Optional
 
-def analyze_data(data: List[Union[int, float]]) -> Tuple[float, float, float]:
+def process_and_analyze_data(file_path: str, column_name: str) -> Tuple[Optional[float], Optional[float]]:
     """
-    Analyze a list of numerical data to calculate the mean, median, and standard deviation.
+    Process and analyze data from a CSV file.
+
+    This function reads a CSV file, cleans the data by removing rows with missing values
+    in the specified column, and calculates the mean and standard deviation of the specified column.
 
     Args:
-        data (List[Union[int, float]]): A list of numerical values.
+        file_path (str): The path to the CSV file.
+        column_name (str): The name of the column to analyze.
 
     Returns:
-        Tuple[float, float, float]: A tuple containing the mean, median, and standard deviation.
+        Tuple[Optional[float], Optional[float]]: A tuple containing the mean and standard deviation
+        of the specified column. If the column does not exist or there are no valid data points,
+        it returns (None, None).
 
     Raises:
-        ValueError: If the input list is empty or contains non-numerical values.
+        FileNotFoundError: If the specified file does not exist.
+        KeyError: If the specified column does not exist in the CSV file.
     """
-    if not data:
-        raise ValueError("The input list is empty.")
-
     try:
-        # Calculate mean
-        mean = statistics.mean(data)
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(file_path)
 
-        # Calculate median
-        median = statistics.median(data)
+        # Check if the specified column exists in the DataFrame
+        if column_name not in df.columns:
+            raise KeyError(f"Column '{column_name}' does not exist in the CSV file.")
 
-        # Calculate standard deviation
-        stdev = statistics.stdev(data)
+        # Drop rows with missing values in the specified column
+        df_cleaned = df.dropna(subset=[column_name])
 
-    except statistics.StatisticsError as e:
-        raise ValueError(f"Statistics error: {e}")
-    except TypeError as e:
-        raise ValueError(f"Type error: {e}")
+        # Check if there are any valid data points left
+        if df_cleaned.empty:
+            return None, None
 
-    return mean, median, stdev
+        # Calculate the mean and standard deviation of the specified column
+        mean_value = df_cleaned[column_name].mean()
+        std_value = df_cleaned[column_name].std()
+
+        return mean_value, std_value
+
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        return None, None
+    except KeyError as e:
+        print(f"Error: {e}")
+        return None, None
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return None, None
 
 # Example usage:
-if __name__ == "__main__":
-    try:
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        mean, median, stdev = analyze_data(data)
-        print(f"Mean: {mean}, Median: {median}, Standard Deviation: {stdev}")
-    except ValueError as e:
-        print(f"Error: {e}")
+# mean, std = process_and_analyze_data('data.csv', 'age')
+# print(f"Mean: {mean}, Standard Deviation: {std}")
 
 def run_tests():
     """Execute tests based on the function type"""
@@ -138,8 +151,8 @@ def run_tests():
                     print(f"Result: {json.dumps(result, default=json_serializer, indent=2)}")
                 except Exception as e:
                     print(f"Error: {str(e)}")
-            else:
-                print("No suitable test function found")
+        else:
+            print("No suitable test function found")
     
     finally:
         # Clean up test file if it was created

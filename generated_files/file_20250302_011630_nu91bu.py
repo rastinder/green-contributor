@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-02 00:42:13
+Generated at: 2025-03-02 01:16:35
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,64 +15,50 @@ import pandas as pd
 
 
 
-import csv
-from typing import Dict, List, Union
+import pandas as pd
+from typing import Dict, Union
 
-def process_sales_data(file_path: str) -> Dict[str, float]:
+def analyze_column(df: pd.DataFrame, column: str) -> Dict[str, Union[float, str]]:
     """
-    Process a CSV file containing sales data and calculate the total sales for each product.
+    Analyze a specified column in a pandas DataFrame by calculating the mean, median, and standard deviation.
 
-    Args:
-        file_path (str): The path to the CSV file.
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+    column (str): The name of the column to analyze.
 
     Returns:
-        Dict[str, float]: A dictionary where the keys are product names and the values are the total sales.
+    Dict[str, Union[float, str]]: A dictionary containing the mean, median, and standard deviation of the specified column.
 
     Raises:
-        FileNotFoundError: If the specified file does not exist.
-        ValueError: If there is an issue with the data format in the CSV file.
+    KeyError: If the specified column does not exist in the DataFrame.
+    ValueError: If the specified column contains non-numeric data.
     """
-    sales_data: Dict[str, float] = {}
 
-    try:
-        with open(file_path, mode='r', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
+    # Check if the column exists in the DataFrame
+    if column not in df.columns:
+        raise KeyError(f"Column '{column}' does not exist in the DataFrame.")
 
-            # Check if the required columns are present
-            required_columns = {'Product', 'Sales'}
-            if not required_columns.issubset(reader.fieldnames):
-                raise ValueError("CSV file must contain 'Product' and 'Sales' columns.")
+    # Check if the column contains numeric data
+    if not pd.api.types.is_numeric_dtype(df[column]):
+        raise ValueError(f"Column '{column}' contains non-numeric data.")
 
-            for row in reader:
-                product = row['Product']
-                sales = row['Sales']
+    # Calculate mean, median, and standard deviation
+    mean = df[column].mean()
+    median = df[column].median()
+    std_dev = df[column].std()
 
-                # Validate and convert sales to float
-                try:
-                    sales_value = float(sales)
-                except ValueError:
-                    raise ValueError(f"Invalid sales value '{sales}' for product '{product}'")
+    # Create a dictionary to store the results
+    result = {
+        'mean': mean,
+        'median': median,
+        'std_dev': std_dev
+    }
 
-                if product in sales_data:
-                    sales_data[product] += sales_value
-                else:
-                    sales_data[product] = sales_value
-
-    except FileNotFoundError:
-        print(f"Error: The file at {file_path} does not exist.")
-        raise
-    except ValueError as ve:
-        print(f"Error: {ve}")
-        raise
-
-    return sales_data
+    return result
 
 # Example usage:
-# try:
-#     result = process_sales_data('sales_data.csv')
-#     print(result)
-# except (FileNotFoundError, ValueError) as e:
-#     print(f"An error occurred: {e}")
+# df = pd.DataFrame({'A': [1, 2, 3, 4, 5], 'B': [5, 4, 3, 2, 1]})
+# print(analyze_column(df, 'A'))
 
 def run_tests():
     """Execute tests based on the function type"""
@@ -152,13 +138,13 @@ def run_tests():
                     print(f"Result: {json.dumps(result, default=json_serializer, indent=2)}")
                 except Exception as e:
                     print(f"Error: {str(e)}")
-            else:
-                print("No suitable test function found")
-        
-        finally:
-            # Clean up test file if it was created
-            if test_csv and os.path.exists(test_csv):
-                os.remove(test_csv)
+        else:
+            print("No suitable test function found")
+    
+    finally:
+        # Clean up test file if it was created
+        if test_csv and os.path.exists(test_csv):
+            os.remove(test_csv)
 
 if __name__ == "__main__":
     # Get all functions in the current module
