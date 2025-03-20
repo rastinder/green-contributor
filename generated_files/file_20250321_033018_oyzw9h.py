@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-04 07:30:07
+Generated at: 2025-03-21 03:30:22
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,59 +15,57 @@ import pandas as pd
 
 
 
-import csv
-from typing import List, Tuple, Union
+import pandas as pd
+from typing import Dict, Any
 
-def process_csv(file_path: str, column_name: str) -> Union[float, str]:
+def process_data(file_path: str) -> Dict[str, Any]:
     """
-    Process a CSV file to calculate the average of a specified column.
+    Process a CSV file to calculate the mean and standard deviation for each column.
 
-    Args:
-        file_path (str): The path to the CSV file.
-        column_name (str): The name of the column to calculate the average for.
+    Parameters:
+    file_path (str): The path to the CSV file to be processed.
 
     Returns:
-        Union[float, str]: The average value of the specified column, or an error message if an error occurs.
+    Dict[str, Any]: A dictionary containing the mean and standard deviation for each column.
 
     Raises:
-        FileNotFoundError: If the specified file does not exist.
-        KeyError: If the specified column does not exist in the CSV file.
+    FileNotFoundError: If the specified file does not exist.
+    pd.errors.EmptyDataError: If the file is empty.
+    pd.errors.ParserError: If there is an error parsing the file.
     """
     try:
-        with open(file_path, mode='r', newline='') as file:
-            reader = csv.DictReader(file)
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(file_path)
 
-            # Check if the specified column exists in the CSV file
-            if column_name not in reader.fieldnames:
-                raise KeyError(f"Column '{column_name}' not found in the CSV file.")
+        # Initialize a dictionary to store the results
+        results = {}
 
-            # Initialize variables to calculate the average
-            total = 0
-            count = 0
+        # Iterate over each column in the DataFrame
+        for column in df.columns:
+            # Calculate the mean and standard deviation for the column
+            mean = df[column].mean()
+            std_dev = df[column].std()
 
-            for row in reader:
-                try:
-                    value = float(row[column_name])
-                    total += value
-                    count += 1
-                except ValueError:
-                    # Skip rows where the specified column cannot be converted to a float
-                    continue
+            # Store the results in the dictionary
+            results[column] = {
+                'mean': mean,
+                'std_dev': std_dev
+            }
 
-            if count == 0:
-                return "No valid data found in the specified column."
-
-            average = total / count
-            return average
+        return results
 
     except FileNotFoundError:
-        return f"Error: The file '{file_path}' does not exist."
+        print(f"Error: The file '{file_path}' does not exist.")
+    except pd.errors.EmptyDataError:
+        print(f"Error: The file '{file_path}' is empty.")
+    except pd.errors.ParserError:
+        print(f"Error: There was an error parsing the file '{file_path}'.")
     except Exception as e:
-        return f"An unexpected error occurred: {e}"
+        print(f"An unexpected error occurred: {e}")
 
 # Example usage:
-# result = process_csv('data.csv', 'age')
-# print(result)
+# results = process_data('data.csv')
+# print(results)
 
 def run_tests():
     """Execute tests based on the function type"""

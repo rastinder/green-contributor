@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-21 03:00:06
+Generated at: 2025-03-21 03:30:05
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,57 +15,68 @@ import pandas as pd
 
 
 
-import pandas as pd
-from typing import Union
+import csv
+from typing import Dict, List, Tuple
 
-def analyze_column(df: pd.DataFrame, column: str) -> Union[dict, str]:
+def process_sales_data(file_path: str) -> Dict[str, float]:
     """
-    Analyze a specified column in a Pandas DataFrame by calculating the mean, median, and standard deviation.
+    Process a CSV file containing sales data and calculate the total sales for each product category.
 
-    Parameters:
-    df (pd.DataFrame): The input DataFrame.
-    column (str): The name of the column to analyze.
+    Args:
+    file_path (str): The path to the CSV file containing the sales data.
 
     Returns:
-    Union[dict, str]: A dictionary containing the mean, median, and standard deviation if successful,
-                      or an error message if an error occurs.
+    Dict[str, float]: A dictionary where the keys are product categories and the values are the total sales for each category.
 
     Raises:
-    ValueError: If the specified column does not exist in the DataFrame.
-    TypeError: If the input DataFrame is not a Pandas DataFrame or the column name is not a string.
+    FileNotFoundError: If the specified file does not exist.
+    ValueError: If the CSV file is not formatted correctly.
     """
-    # Check if the input DataFrame is a Pandas DataFrame
-    if not isinstance(df, pd.DataFrame):
-        return "Error: The input must be a Pandas DataFrame."
-
-    # Check if the column name is a string
-    if not isinstance(column, str):
-        return "Error: The column name must be a string."
-
-    # Check if the specified column exists in the DataFrame
-    if column not in df.columns:
-        return f"Error: The column '{column}' does not exist in the DataFrame."
-
     try:
-        # Calculate the mean, median, and standard deviation
-        mean = df[column].mean()
-        median = df[column].median()
-        std_dev = df[column].std()
+        # Dictionary to store total sales for each category
+        category_sales: Dict[str, float] = {}
 
-        # Return the results as a dictionary
-        return {
-            'mean': mean,
-            'median': median,
-            'std_dev': std_dev
-        }
+        # Open the CSV file
+        with open(file_path, mode='r', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+
+            # Check if the required columns are present
+            required_columns = {'Category', 'Sales'}
+            if not required_columns.issubset(reader.fieldnames):
+                raise ValueError("CSV file must contain 'Category' and 'Sales' columns.")
+
+            # Process each row in the CSV file
+            for row in reader:
+                category = row['Category']
+                sales = row['Sales']
+
+                # Convert sales to float
+                try:
+                    sales_value = float(sales)
+                except ValueError:
+                    raise ValueError(f"Invalid sales value '{sales}' for category '{category}'")
+
+                # Update the total sales for the category
+                if category in category_sales:
+                    category_sales[category] += sales_value
+                else:
+                    category_sales[category] = sales_value
+
+        return category_sales
+
+    except FileNotFoundError:
+        print(f"Error: The file at {file_path} does not exist.")
+        raise
+    except ValueError as ve:
+        print(f"Error: {ve}")
+        raise
     except Exception as e:
-        # Handle any other exceptions that may occur
-        return f"An error occurred: {str(e)}"
+        print(f"An unexpected error occurred: {e}")
+        raise
 
 # Example usage:
-# df = pd.DataFrame({'A': [1, 2, 3, 4, 5], 'B': [5, 6, 7, 8, 9]})
-# result = analyze_column(df, 'A')
-# print(result)
+# sales_data = process_sales_data('sales_data.csv')
+# print(sales_data)
 
 def run_tests():
     """Execute tests based on the function type"""

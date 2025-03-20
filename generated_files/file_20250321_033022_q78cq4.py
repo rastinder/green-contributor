@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-21 03:00:14
+Generated at: 2025-03-21 03:30:26
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,63 +15,65 @@ import pandas as pd
 
 
 
-import pandas as pd
-from typing import Optional
+import csv
+from typing import List, Tuple, Union
+import statistics
 
-def process_and_analyze_data(file_path: str, column_name: str) -> Optional[dict]:
+def process_data(file_path: str, column_name: str) -> Tuple[Union[float, str], Union[float, str]]:
     """
-    Process and analyze data from a CSV file.
-
-    This function reads a CSV file, performs basic data cleaning,
-    and calculates the mean and standard deviation of a specified column.
+    Process data from a CSV file to calculate the mean and standard deviation of a specified column.
 
     Args:
         file_path (str): The path to the CSV file.
         column_name (str): The name of the column to analyze.
 
     Returns:
-        Optional[dict]: A dictionary containing the mean and standard deviation
-                        of the specified column, or None if an error occurs.
+        Tuple[Union[float, str], Union[float, str]]: A tuple containing the mean and standard deviation.
+        If an error occurs, returns a tuple with error messages.
 
     Raises:
         FileNotFoundError: If the specified file does not exist.
-        KeyError: If the specified column does not exist in the CSV file.
+        ValueError: If the specified column does not exist in the CSV file.
     """
     try:
-        # Read the CSV file into a DataFrame
-        df = pd.read_csv(file_path)
+        # Open the CSV file
+        with open(file_path, mode='r', newline='') as file:
+            reader = csv.DictReader(file)
 
-        # Check if the specified column exists in the DataFrame
-        if column_name not in df.columns:
-            raise KeyError(f"Column '{column_name}' not found in the CSV file.")
+            # Check if the specified column exists in the CSV file
+            if column_name not in reader.fieldnames:
+                raise ValueError(f"Column '{column_name}' does not exist in the CSV file.")
 
-        # Drop rows with missing values in the specified column
-        df_cleaned = df.dropna(subset=[column_name])
+            # Extract the data from the specified column
+            data: List[float] = []
+            for row in reader:
+                try:
+                    value = float(row[column_name])
+                    data.append(value)
+                except ValueError:
+                    # Skip rows with invalid data
+                    continue
 
-        # Calculate the mean and standard deviation of the specified column
-        mean = df_cleaned[column_name].mean()
-        std_dev = df_cleaned[column_name].std()
+            # Calculate the mean and standard deviation
+            if not data:
+                return "No valid data to process", "No valid data to process"
 
-        # Return the results as a dictionary
-        return {
-            'mean': mean,
-            'std_dev': std_dev
-        }
+            mean = statistics.mean(data)
+            std_dev = statistics.stdev(data)
 
-    except FileNotFoundError as e:
-        print(f"Error: {e}")
-        return None
-    except KeyError as e:
-        print(f"Error: {e}")
-        return None
+            return mean, std_dev
+
+    except FileNotFoundError:
+        return f"File '{file_path}' not found.", f"File '{file_path}' not found."
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return None
+        return str(e), str(e)
 
-# Example usage:
-# result = process_and_analyze_data('data.csv', 'column_name')
-# if result:
-#     print(f"Mean: {result['mean']}, Standard Deviation: {result['std_dev']}")
+# Example usage
+if __name__ == "__main__":
+    file_path = "data.csv"
+    column_name = "value"
+    mean, std_dev = process_data(file_path, column_name)
+    print(f"Mean: {mean}, Standard Deviation: {std_dev}")
 
 def run_tests():
     """Execute tests based on the function type"""

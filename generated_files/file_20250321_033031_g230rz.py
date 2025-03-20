@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-04 10:30:30
+Generated at: 2025-03-21 03:30:36
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,60 +15,68 @@ import pandas as pd
 
 
 
-import csv
-from typing import Dict, List, Union
+import pandas as pd
+from typing import Optional
 
-def process_sales_data(file_path: str) -> Dict[str, float]:
+def process_and_analyze_data(file_path: str) -> Optional[pd.DataFrame]:
     """
-    Process a CSV file containing sales data and return a dictionary with
-    the total sales for each product.
+    Processes and analyzes data from a CSV file.
+
+    This function reads a CSV file, performs basic data cleaning,
+    and calculates summary statistics for numerical columns.
 
     Parameters:
     file_path (str): The path to the CSV file.
 
     Returns:
-    Dict[str, float]: A dictionary where keys are product names and values are total sales.
+    Optional[pd.DataFrame]: A DataFrame containing summary statistics if successful, otherwise None.
 
     Raises:
     FileNotFoundError: If the specified file does not exist.
-    ValueError: If the file does not have the expected format.
+    pd.errors.EmptyDataError: If the file is empty.
+    pd.errors.ParserError: If there is an error parsing the file.
     """
-    sales_data: Dict[str, float] = {}
 
     try:
-        with open(file_path, mode='r', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(file_path)
 
-            # Check if the expected columns are present
-            expected_columns = {'Product', 'Quantity', 'Price'}
-            if not expected_columns.issubset(reader.fieldnames):
-                raise ValueError("CSV file does not have the expected columns: 'Product', 'Quantity', 'Price'")
+        # Display the first few rows of the DataFrame
+        print("First few rows of the DataFrame:")
+        print(df.head())
 
-            for row in reader:
-                product = row['Product']
-                quantity = float(row['Quantity'])
-                price = float(row['Price'])
+        # Basic data cleaning: Drop rows with any missing values
+        df_cleaned = df.dropna()
 
-                if product in sales_data:
-                    sales_data[product] += quantity * price
-                else:
-                    sales_data[product] = quantity * price
+        # Display the number of rows before and after cleaning
+        print(f"Number of rows before cleaning: {len(df)}")
+        print(f"Number of rows after cleaning: {len(df_cleaned)}")
+
+        # Calculate summary statistics for numerical columns
+        summary_stats = df_cleaned.describe()
+
+        # Display the summary statistics
+        print("Summary statistics for numerical columns:")
+        print(summary_stats)
+
+        return summary_stats
 
     except FileNotFoundError:
         print(f"Error: The file at {file_path} does not exist.")
-        raise
-    except ValueError as ve:
-        print(f"Error: {ve}")
-        raise
+    except pd.errors.EmptyDataError:
+        print(f"Error: The file at {file_path} is empty.")
+    except pd.errors.ParserError:
+        print(f"Error: There was an error parsing the file at {file_path}.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-        raise
 
-    return sales_data
+    return None
 
 # Example usage:
-# sales = process_sales_data('sales_data.csv')
-# print(sales)
+# summary_stats = process_and_analyze_data('data.csv')
+# if summary_stats is not None:
+#     print("Summary statistics:")
+#     print(summary_stats)
 
 def run_tests():
     """Execute tests based on the function type"""
