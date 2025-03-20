@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-04 12:00:23
+Generated at: 2025-03-21 03:00:10
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,62 +15,56 @@ import pandas as pd
 
 
 
-import csv
-from typing import List, Dict, Union
+import pandas as pd
+from typing import Dict, Union
 
-def calculate_column_average(file_path: str, column_name: str) -> Union[float, str]:
+def process_data(file_path: str) -> Dict[str, Union[float, str]]:
     """
-    Calculate the average value of a specified column in a CSV file.
+    Process a CSV file to calculate the mean and standard deviation for each numerical column.
 
-    Args:
-        file_path (str): The path to the CSV file.
-        column_name (str): The name of the column to calculate the average for.
+    Parameters:
+    file_path (str): The path to the CSV file.
 
     Returns:
-        Union[float, str]: The average value of the specified column, or an error message if an error occurs.
+    Dict[str, Union[float, str]]: A dictionary with the mean and standard deviation for each numerical column.
+        If an error occurs, returns a dictionary with an error message.
 
     Raises:
-        FileNotFoundError: If the specified file does not exist.
-        ValueError: If the specified column does not exist in the CSV file.
+    FileNotFoundError: If the specified file does not exist.
+    pd.errors.EmptyDataError: If the file is empty.
+    pd.errors.ParserError: If there is an error parsing the file.
     """
     try:
-        # Open the CSV file
-        with open(file_path, mode='r', newline='') as file:
-            reader = csv.DictReader(file)
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(file_path)
 
-            # Check if the specified column exists in the CSV file
-            if column_name not in reader.fieldnames:
-                raise ValueError(f"Column '{column_name}' does not exist in the CSV file.")
+        # Initialize a dictionary to store the results
+        results = {}
 
-            # Initialize variables to store the sum and count of valid values
-            total_sum = 0.0
-            count = 0
+        # Iterate over each column in the DataFrame
+        for column in df.columns:
+            if pd.api.types.is_numeric_dtype(df[column]):
+                # Calculate mean and standard deviation for numerical columns
+                mean = df[column].mean()
+                std_dev = df[column].std()
+                results[column] = {'mean': mean, 'std_dev': std_dev}
+            else:
+                # For non-numerical columns, store a message indicating they are skipped
+                results[column] = 'Skipped (non-numerical)'
 
-            # Process each row in the CSV file
-            for row in reader:
-                try:
-                    # Convert the value in the specified column to a float
-                    value = float(row[column_name])
-                    total_sum += value
-                    count += 1
-                except ValueError:
-                    # Skip rows with invalid values in the specified column
-                    continue
-
-            # Calculate the average
-            if count == 0:
-                return "No valid data found in the specified column."
-
-            average = total_sum / count
-            return average
+        return results
 
     except FileNotFoundError:
-        return f"File not found: {file_path}"
+        return {'error': 'File not found.'}
+    except pd.errors.EmptyDataError:
+        return {'error': 'The file is empty.'}
+    except pd.errors.ParserError:
+        return {'error': 'Error parsing the file.'}
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        return {'error': str(e)}
 
 # Example usage:
-# result = calculate_column_average('data.csv', 'age')
+# result = process_data('data.csv')
 # print(result)
 
 def run_tests():

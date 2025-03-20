@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-04 12:00:40
+Generated at: 2025-03-21 03:00:06
 
 This file contains Python code for data processing with error handling.
 """
@@ -15,56 +15,57 @@ import pandas as pd
 
 
 
-from typing import List, Tuple, Union
-import statistics
+import pandas as pd
+from typing import Union
 
-def data_analysis(data: List[Union[int, float]]) -> Tuple[float, float, float]:
+def analyze_column(df: pd.DataFrame, column: str) -> Union[dict, str]:
     """
-    Perform data analysis on a list of numerical data.
+    Analyze a specified column in a Pandas DataFrame by calculating the mean, median, and standard deviation.
 
-    This function calculates the mean, median, and standard deviation of the input data.
-
-    Args:
-    data (List[Union[int, float]]): A list of numerical data (integers or floats).
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+    column (str): The name of the column to analyze.
 
     Returns:
-    Tuple[float, float, float]: A tuple containing the mean, median, and standard deviation.
+    Union[dict, str]: A dictionary containing the mean, median, and standard deviation if successful,
+                      or an error message if an error occurs.
 
     Raises:
-    ValueError: If the input data list is empty or contains non-numerical values.
+    ValueError: If the specified column does not exist in the DataFrame.
+    TypeError: If the input DataFrame is not a Pandas DataFrame or the column name is not a string.
     """
-    # Check if the input data list is empty
-    if not data:
-        raise ValueError("The input data list is empty.")
+    # Check if the input DataFrame is a Pandas DataFrame
+    if not isinstance(df, pd.DataFrame):
+        return "Error: The input must be a Pandas DataFrame."
 
-    # Check if all elements in the data list are numerical
-    for item in data:
-        if not isinstance(item, (int, float)):
-            raise ValueError("The input data list contains non-numerical values.")
+    # Check if the column name is a string
+    if not isinstance(column, str):
+        return "Error: The column name must be a string."
+
+    # Check if the specified column exists in the DataFrame
+    if column not in df.columns:
+        return f"Error: The column '{column}' does not exist in the DataFrame."
 
     try:
-        # Calculate mean
-        mean = statistics.mean(data)
+        # Calculate the mean, median, and standard deviation
+        mean = df[column].mean()
+        median = df[column].median()
+        std_dev = df[column].std()
 
-        # Calculate median
-        median = statistics.median(data)
-
-        # Calculate standard deviation
-        stdev = statistics.stdev(data)
-
-    except statistics.StatisticsError as e:
-        raise ValueError(f"Statistics calculation error: {e}")
-
-    return mean, median, stdev
+        # Return the results as a dictionary
+        return {
+            'mean': mean,
+            'median': median,
+            'std_dev': std_dev
+        }
+    except Exception as e:
+        # Handle any other exceptions that may occur
+        return f"An error occurred: {str(e)}"
 
 # Example usage:
-if __name__ == "__main__":
-    try:
-        data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        mean, median, stdev = data_analysis(data)
-        print(f"Mean: {mean}, Median: {median}, Standard Deviation: {stdev}")
-    except ValueError as e:
-        print(f"Error: {e}")
+# df = pd.DataFrame({'A': [1, 2, 3, 4, 5], 'B': [5, 6, 7, 8, 9]})
+# result = analyze_column(df, 'A')
+# print(result)
 
 def run_tests():
     """Execute tests based on the function type"""

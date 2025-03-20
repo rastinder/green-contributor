@@ -1,6 +1,6 @@
 """
 Auto-generated Python file for GitHub contributions.
-Generated at: 2025-03-04 09:00:26
+Generated at: 2025-03-21 03:00:14
 
 This file contains Python code for data processing with error handling.
 """
@@ -22,40 +22,40 @@ def process_and_analyze_data(file_path: str, column_name: str) -> Optional[dict]
     """
     Process and analyze data from a CSV file.
 
-    This function reads a CSV file, handles missing values by filling them with the mean of the column,
-    and calculates the mean and standard deviation of the specified column.
+    This function reads a CSV file, performs basic data cleaning,
+    and calculates the mean and standard deviation of a specified column.
 
-    Parameters:
-    file_path (str): The path to the CSV file.
-    column_name (str): The name of the column to analyze.
+    Args:
+        file_path (str): The path to the CSV file.
+        column_name (str): The name of the column to analyze.
 
     Returns:
-    Optional[dict]: A dictionary containing the mean and standard deviation of the specified column,
-                    or None if an error occurs.
+        Optional[dict]: A dictionary containing the mean and standard deviation
+                        of the specified column, or None if an error occurs.
 
     Raises:
-    FileNotFoundError: If the specified file does not exist.
-    KeyError: If the specified column does not exist in the CSV file.
+        FileNotFoundError: If the specified file does not exist.
+        KeyError: If the specified column does not exist in the CSV file.
     """
     try:
-        # Read the CSV file
+        # Read the CSV file into a DataFrame
         df = pd.read_csv(file_path)
 
         # Check if the specified column exists in the DataFrame
         if column_name not in df.columns:
             raise KeyError(f"Column '{column_name}' not found in the CSV file.")
 
-        # Handle missing values by filling them with the mean of the column
-        df[column_name].fillna(df[column_name].mean(), inplace=True)
+        # Drop rows with missing values in the specified column
+        df_cleaned = df.dropna(subset=[column_name])
 
         # Calculate the mean and standard deviation of the specified column
-        mean_value = df[column_name].mean()
-        std_dev_value = df[column_name].std()
+        mean = df_cleaned[column_name].mean()
+        std_dev = df_cleaned[column_name].std()
 
         # Return the results as a dictionary
         return {
-            'mean': mean_value,
-            'standard_deviation': std_dev_value
+            'mean': mean,
+            'std_dev': std_dev
         }
 
     except FileNotFoundError as e:
@@ -71,7 +71,7 @@ def process_and_analyze_data(file_path: str, column_name: str) -> Optional[dict]
 # Example usage:
 # result = process_and_analyze_data('data.csv', 'column_name')
 # if result:
-#     print(f"Mean: {result['mean']}, Standard Deviation: {result['standard_deviation']}")
+#     print(f"Mean: {result['mean']}, Standard Deviation: {result['std_dev']}")
 
 def run_tests():
     """Execute tests based on the function type"""
